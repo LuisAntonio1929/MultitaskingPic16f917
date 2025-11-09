@@ -15,9 +15,9 @@ Este proyecto desarolla un programa para un PIC que le permite medir una señal 
 
 Cargar CCPR2 para lanzar una conversión analógica cada 100ms.
 
-\[
+$$
 T = \frac{4}{F_{osc}}
-\]
+$$
 
 ### Cálculo del TMR2
 
