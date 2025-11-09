@@ -3,4 +3,4 @@ Este proyecto desarolla un programa para un PIC que le permite medir una señal 
 
 ## Demostración de funcionamiento
 
-![Animación de velocidad](lcd.gif)
+![Animación de velocidad](demostracion.gif)
