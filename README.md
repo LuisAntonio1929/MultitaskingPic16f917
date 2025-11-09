@@ -3,7 +3,7 @@ Este proyecto desarolla un programa para un PIC que le permite medir una señal 
 
 ## Circuito
 
-<img src="https://drive.google.com/file/d/1Ii-geYPyQtqCHmeLWiqxaaEGh4wnvsSX/view?usp=drive_link" alt="Descripción" style="display:block; margin:auto;">
+<img src="circuito.png" alt="Descripción" style="display:block; margin:auto;">
 
 ## Demostración de funcionamiento
 
