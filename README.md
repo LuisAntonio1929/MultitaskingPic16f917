@@ -21,6 +21,7 @@ Este proyecto desarolla un programa para un PIC que le permite medir una señal 
 - Timer 2
 - CCP2
 - Comparador Analógico
+- Conversor Analógico
 
 ## Cálculos previos
 
@@ -58,32 +59,107 @@ $$
 V = (ADRES>>1)-(ADRES>>6)+(ADRES>>8)
 $$
 
+Para la conversión se seleccionó una frecuencia de Fosc/16. Debido a que según el datasheet el Tad debe de ser 1.6us. Y al usarse un reloj interno de 8MHz se obtiene:
+
+$$
+T_{AD}= \frac{16}{F_{OSC}}=2us
+$$
+
 ---
 ## Pseudocódigo
 
-```plaintext
-// Actualiza información si se ha pulsado el botón
-SI (show = 1)
-    show ← 0
+### Configuración
+```text
+//Configuración de los fusibles
+Oscilador interno
+WDT desactivado
+Brownout desactivado
+ADC de 10 bits
+Reloj de 8MHz
 
-// Mostrar información en LCD
-Ir a posición (8,2) del LCD
-Escribir el valor de x         [printf(lcd_putc,"%u",x);]
+//Variables globales
+cont1 y cont2 (enteros)
+cont1 ← 0
+cont2 ← 0
 
-// Mostrar información en LEDs
-SI_NO        LED2 ← 0   LED1 ← 0
-    SI (x = 0)
-        LED2 ← 0   LED1 ← 0
-    SI_NO
-        SI (x = 1)
-            LED2 ← 0   LED1 ← 1
-        SI_NO
-            SI (x = 2)
-                LED2 ← 1   LED1 ← 0
-            SI_NO
-                SI (x = 3)
-                    LED2 ← 1   LED1 ← 1
+//Configuracion de pines
+PORTD salida (Pines del LCD)
+B0 entrada
+B2 y B3 salidas
+B2 ← 0
+B3 ← 0
+A0 y A3 entradas analogicas
+
+//Configuracion del conversor analógic0
+Datos justificados a la derecha
+A0 como canal analogico
+Frecuencia de conversion analógica Fos/16
+Encender módulo analógico
+
+//Configuración del comparador analógico
+A0 entrada inversora del opamp
+A3 entrada noinversora del opamp
+C1 //Bit del registro que es 1 si A0 < A3 y es 0 si A0 > A3
+//Configuracion CCP2
+Modo comparacion con reseteo del TMR1 y evento ADC
+CCPR2 ← 50000
+
+//Configuracion del TMR1
+Prescaler 1:4
+Fuente de reloj interna
+Encender TMR1
+
+//Configuracion del TMR2
+Prescaler 1:16
+Postcaler 1:16
+PR2 ← 216
+
+//Configuracion de las interrupciones
+Habilitar interrupciones globales
+Habilitar interrupciones por perifericos
+Habilitar interrupcion por TMR2
 ```
+### Programa principal
+
+```text
+Inicializar LCD
+si(C1)	//Bit del registro del comparador analogico que es 1 si A0 < A3 y es 0 si A0 > A3
+	Escribir: "Aumentar tension"
+	B3 ← 0
+sino
+	Escribir: "Bajar tension"
+	B3 ← 1
+while(1)
+	si(B0==0)
+		B2 ← ~B2
+		Encender TMR2
+	si(Flag ADC)
+		Limpiar Flag ADC
+		v = ADRES*5/1023
+		Escribir: "Tension: {v} V"
+	si(Flag comparador)	//Hay un flag cada vez que la salida del opamp tiene un cambio
+		Limpiar flag comparador
+		si(C1)
+			Escribir: "Aumentar tension"
+			B3 ← 0
+		sino
+			Escribir: "Bajar tension"
+			B3 ← 1
+```
+
+### Interrupción por TMR2
+
+```text
+cont1 ← cont1 + 1
+si(cont1 es 18)
+	cont1 ← 0
+	cont2 ← cont2 + 1
+	B2 ← ~B2
+	si(cont2 es 5)
+		cont2 ← 0
+		Apagar TMR2
+```
+
 ---
 ## Código
 
@@ -145,7 +221,7 @@ void configuracion(){
    bit_clear(ADCON0,6);		//Voltage Reference VSS
    bit_clear(ADCON0,5);		//Voltage Reference VDD
    bit_clear(ADCON0,4);bit_clear(ADCON0,3);bit_clear(ADCON0,2);		//AN0 es el canal analogico
-   bit_clear(ADCON1,6);bit_clear(ADCON1,5);bit_set(ADCON1,4);		//FOSC/8
+   bit_set(ADCON1,6);bit_clear(ADCON1,5);bit_set(ADCON1,4);		//FOSC/16
    bit_set(ADCON0,0);		//A/D converter module is operating
    //Configuracion del comparador analógico
    bit_clear(CMCON0,4);		//C1 Output not inverted
