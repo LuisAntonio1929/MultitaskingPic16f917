@@ -1,6 +1,10 @@
 # MultitaskingPic16f917
 Este proyecto desarolla un programa para un PIC que le permite medir una señal de voltaje variable, compara dicha señal, mostrar el valor analogico y contar parpadeos al mismo tiempo.
 
+## Circuito
+
+<img src="https://drive.google.com/file/d/1Ii-geYPyQtqCHmeLWiqxaaEGh4wnvsSX/view?usp=drive_link" alt="Descripción" style="display:block; margin:auto;">
+
 ## Demostración de funcionamiento
 
 ![Animación de velocidad](demostracion.gif)
