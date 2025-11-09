@@ -59,7 +59,7 @@ $$
 V = (ADRES>>1)-(ADRES>>6)+(ADRES>>8)
 $$
 
-Para la conversión se seleccionó una frecuencia de Fosc/16. Debido a que según el datasheet el Tad debe de ser 1.6us. Y al usarse un reloj interno de 8MHz se obtiene:
+Para la conversión se seleccionó una frecuencia de Fosc/16. Debido a que según el datasheet el $T_{AD}$ debe de ser de almenos 1.6us. Y al usarse un reloj interno de 8MHz se obtiene:
 
 $$
 T_{AD}= \frac{16}{F_{OSC}}=2us
